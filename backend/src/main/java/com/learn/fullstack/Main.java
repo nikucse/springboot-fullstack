@@ -29,7 +29,7 @@ public class Main {
                     random.nextInt(16,99)
 
             );
-            customerRepository.save(customer);
+            //customerRepository.save(customer);
         };
     }
 }
