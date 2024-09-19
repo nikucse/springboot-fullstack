@@ -14,12 +14,12 @@ spring:
     username: nikul
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-    show-sql: true
+      show-sql: true
 
   flyway:
     baseline-on-migrate: true
