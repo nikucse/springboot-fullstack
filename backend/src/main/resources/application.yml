@@ -1,0 +1,29 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+
+spring:
+  main:
+    web-application-type: SERVLET
+
+# connecting Database
+  datasource:
+    url: jdbc:postgresql://localhost:5432/customer
+    password: nikul123
+    username: nikul
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+  flyway:
+    baseline-on-migrate: true
+
+#logging:
+#  level:
+#    root: ERROR

@@ -1,0 +1,132 @@
+# connect to db :-
+docker exec -it postgres bash
+psql -U username
+# /c db_name is using for switch database in postgresql
+
+select * from pg_stat_activity;
+
+------------------------------------------------------------------
+
+# Data Source ---> connection pool ----> DATABASE
+A DataSource object provide a new way for jdbc clients to obtain a connection to a database.
+This Datasource entry is used to create a connection pool.
+    - HikariCP
+    - TomcatCP
+
+    DataSource Properties
+        - datasource.url = postgresql://localhost:5432/db_name
+        - datasource.username = username
+        - datasource.password = password
+        - datasource.driver-class-name = org.postgresql.Driver
+
+ # JDBC
+ Java Database Connectivity (JDBC) is a standard programming interface for accessing relational databases.
+ which defines the standard way to access database.
+
+ # JDBCTemplate -----> JDBC
+ Simplifies the use of JDBC and helps to reduce the boilerplate. It executes the query and returns the result set.
+
+ e.g:- SELECT * FROM users;
+
+dependency
+-spring-boot-starter-jdbc
+
+---------------------------- FLYWAY -----------------------------
+Flyway is a database migration tool that helps you automate database development and accelerate software delivery.
+    -Database types: Works with over 30 database types, including SQL Server, PostgreSQL, Oracle, and MySQL
+    -Version control: Integrates with common CI and release tools like GitHub, Azure DevOps, and Jenkins
+    -Migration types: Migrations can be written in SQL or Java
+    -Editions: Includes a free Community edition for individual developers, as well as other editions
+
+Use cases: Can be used to build a database from scratch, or to incorporate into an existing database build system
+Support: Quarkus provides first-class support for using Flyway
+
+        <dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+
+Steps:
+    1. create a directory inside resource db-> migrattion
+    2. create a file in that directory V1__anyname.sql
+    3. run flyway migrate.
+
+
+ -------------------- JAVA Faker
+ <dependency>
+     <groupId>com.github.javafaker</groupId>
+     <artifactId>javafaker</artifactId>
+     <version>1.0.2</version>
+ </dependency>
+
+--------------------------------- TestContainers --------------------------
+==== H2 Database Engine
+-> Very fast, open source, JDBC API
+-> Embedded and server modes; in memory database
+-> Browser based Console application.
+
+psql -U admin -d fullstack-dao-unit-test-db
+
+--------------------------------------- CI/CD ----------------------------
+
+client --> (CI) --> Github --> compile -- Unit Test --> Integration Test --> JAR --> Build
+        ( CD )--> Docker -> push image to ducker hub -> Deploy -> aws
+
+
+--------------------------------------- DevOps ----------------------------
+DevOps is a set of practice that combines software development(DEV) and IT operations (OPS) to
+shorten the systems development life cycle while delivering features, fixes and updates frequently and reliable.
+
+Goals:
+- Improved collaboration between development and operations teams.
+- Faster delivery of software and updates to customers.
+- Increased reliability and stability of software and infrastructure.
+- Greater efficiency of software development and maintenance and cost saving.
+
+Life Cycle:
+- Planning
+- Development
+- Testing
+- Deployment
+- Monitoring
+
+Each stage is iterative, with feedback from the previous stage to ensure continuous delivery.
+
+==== Key Devops Practices
+1. Continuous Integration (CI)
+2. Continuous Delivery (CD)
+3. Infrastructure as Code (IaC)
+4. Monitoring and Logging
+
+
+--------------------------------- Docker --------------------------
+- Platform for building, running and deploying applications.
+- Developers can easily build, test, and deploy applications running in containers.
+- Local development is the same across all platforms/environments.
+- CI/CD Workflows
+- It is an open source project.
+
+======> Containers
+- A container is an isolated instance of a running application.
+- Contains everything needed to run an application.
+
+
+CODE --> build --> docker Image --> run --> containers
+
+docker run --name fullstack-app --rm -p 8080:8080 --network fullstack-app_db \
+technuzone/fullstack-app --spring.datasource.url=jdbc:postgresql://db:5432/customer
+
+--  docker compose up -d
+-- docker compose down
+
+
+-------------------------------  AWS ----------------------------
+client --> AWS Cloud --> VPC --> Public subnet (Load Balance) --> private subnet --> EC2 , DB
+
+--> AWS Elastic Beanstalk
+--> Amazon ECS
+--> Amazon EC2
