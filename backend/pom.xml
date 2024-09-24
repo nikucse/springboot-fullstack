@@ -21,7 +21,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<docker.username>technuzone</docker.username>
 		<docker.image.name>fullstack-app</docker.image.name>
-		<docker.image.tag>latest</docker.image.tag>
+		<docker.image.tag />
 	</properties>
 	<dependencies>
 		<dependency>
@@ -129,7 +129,7 @@
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
 				<artifactId>jib-maven-plugin</artifactId>
-				<version>3.3.1</version>
+				<version>3.4.3</version>
 				<configuration>
 					<from>
 						<image>eclipse-temurin:17</image>
