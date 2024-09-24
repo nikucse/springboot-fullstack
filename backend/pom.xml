@@ -21,7 +21,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<docker.username>technuzone</docker.username>
 		<docker.image.name>fullstack-app</docker.image.name>
-		<docker.image.tag />
+		<docker.image.tag>latest</docker.image.tag>
 	</properties>
 	<dependencies>
 		<dependency>
