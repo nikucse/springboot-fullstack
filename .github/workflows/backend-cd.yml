@@ -83,5 +83,5 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/fullstack-app:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
             # Run the Docker container
             docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/fullstack-app:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
-            EOF
+            END
       
