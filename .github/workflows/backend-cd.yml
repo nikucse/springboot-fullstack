@@ -34,6 +34,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: List Directory Contents
+        run: ls -la ./backend  # Verify the contents of the backend directory
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
