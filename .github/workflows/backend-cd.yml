@@ -80,8 +80,8 @@ jobs:
             sudo usermod -aG docker $USER  # Allow user to run Docker without sudo
 
             # Pull the Docker image directly from DockerHub
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/fullstack-app:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
             # Run the Docker container
-            docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
+            docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/fullstack-app:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
             EOF
       
