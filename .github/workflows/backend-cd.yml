@@ -1,76 +1,71 @@
 name: CD - Deploy Backend
 
 on:
-
-    workflow_dispatch:
-    push:
-        branches:
-            - main
-        paths:
-            - 'backend/**'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-        services:
-            postgres:
-                image: postgres:16.3
-                env:
-                    POSTGRES_USER: nikul
-                    POSTGRES_PASSWORD: nikul123
-                    POSTGRES_DB: customer
-                ports:
-                    - 5432:5432
-                options: >-
-                    --health-cmd pg_isready
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+  deploy:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.3
+        env:
+          POSTGRES_USER: nikul
+          POSTGRES_PASSWORD: nikul123
+          POSTGRES_DB: customer
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-            - name: Set up JDK 17
-              uses: actions/setup-java@v3
-              with:
-                  java-version: '17'
-                  distribution: 'temurin'
-                  cache: 'maven'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-            - name: Login to DockerHub
-              uses: docker/login-action@v3
-              with:
-                  username: ${{ secrets.DOCKERHUB_USERNAME }}
-                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
 
-            - name: Set Build Number
-              id: docker_build_number
-              run: echo "BUILD_NUMBER=$(date '+%d.%m.%Y.%H.%M.%S')" >> $GITHUB_OUTPUT
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            - name: Build Packge Push Docker Image with Maven
-              run: mvn -ntp -B verify -Ddocker.image.tag=${{ steps.docker_build_number.outputs.BUILD_NUMBER }} jib:build
+      - name: Set Build Number
+        id: docker_build_number
+        run: echo "BUILD_NUMBER=$(date '+%d.%m.%Y.%H.%M.%S')" >> $GITHUB_OUTPUT
 
-            - name: Set up SSH key
-              run: |
-                  echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/my-ec2-key
-                  chmod 600 ~/.ssh/my-ec2-key
+      - name: Build Package and Push Docker Image with Maven
+        run: mvn -ntp -B verify -Ddocker.image.tag=${{ steps.docker_build_number.outputs.BUILD_NUMBER }} jib:build
 
-            - name: Copy Docker Image to AWS EC2
-              run: |
-                  scp -i ~/.ssh/my-ec2-key \
-                -o StrictHostKeyChecking=no \
-                ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ steps.docker_build_number.outputs.BUILD_NUMBER }} \
-                ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/my-ec2-key
+          chmod 600 ~/.ssh/my-ec2-key
 
-            - name: Run Docker Image on AWS EC2
-              run: |
-                  ssh -i ~/.ssh/my-ec2-key -o StrictHostKeyChecking=no \
-                ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-                sudo apt update
-                sudo apt install -y openjdk-17-jdk docker.io maven
-                sudo systemctl enable docker --now
-                sudo usermod -aG docker $USER  # Allow user to run Docker without sudo
-                
-                docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
-                docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
-                EOF
+      - name: Run Docker Image on AWS EC2
+        run: |
+          ssh -i ~/.ssh/my-ec2-key -o StrictHostKeyChecking=no \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            sudo apt update
+            sudo apt install -y openjdk-17-jdk docker.io maven
+            sudo systemctl enable docker --now
+            sudo usermod -aG docker $USER  # Allow user to run Docker without sudo
+          
+            # Pull the Docker image directly from DockerHub
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
+            # Run the Docker container
+            docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ steps.docker_build_number.outputs.BUILD_NUMBER }}
+            EOF
