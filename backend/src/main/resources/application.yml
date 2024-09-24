@@ -9,7 +9,7 @@ spring:
 
 # connecting Database
   datasource:
-    url: jdbc:postgresql://localhost:5432/customer
+    url: jdbc:postgresql://database-1.cf2agm8e24x8.ap-south-1.rds.amazonaws.com:5432/customer
     password: nikul123
     username: nikul
   jpa:

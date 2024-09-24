@@ -20,7 +20,7 @@ services:
     container_name: fullstack-app
     image: technuzone/fullstack-app
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/customer
+      SPRING_DATASOURCE_URL: jdbc:postgresql://customer-app.cf0yea6k6sxl.us-east-1.rds.amazonaws.com:5432/customer
     ports:
       - "8080:8080"
     networks:

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.learn.fullstack.customer.CustomerConstant.*;
+
 @Service
 public class CustomerService {
 
@@ -23,13 +25,13 @@ public class CustomerService {
 
     public Customer getCustomerById(Integer id){
         return customerDao.getCustomerById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("customer with id [%s] not found".formatted(id)));
+                .orElseThrow(()-> new ResourceNotFoundException(CUSTOMER_NOT_FOUND_MSG.formatted(id)));
     }
 
     public void addCustomer(CustomerRegistrationRequest request){
 
         if(customerDao.existsCustomerWithEmail(request.email())){
-            throw new DuplicateResourceException("email already exist.");
+            throw new DuplicateResourceException(CUSTOMER_ALREADY_EXIST_MSG);
         }
 
         customerDao.addCustomer(new Customer(request.name(), request.email(), request.age()));
@@ -37,14 +39,14 @@ public class CustomerService {
 
     public void deleteCustomerById(Integer customerId) {
         if(!customerDao.existsCustomerWithId(customerId)){
-            throw new ResourceNotFoundException("customer with id [%s] not found".formatted(customerId));
+            throw new ResourceNotFoundException(CUSTOMER_NOT_FOUND_MSG.formatted(customerId));
         }
         customerDao.deleteCustomerById(customerId);
     }
 
     public Customer getCustomer(Integer id){
         return customerDao.getCustomerById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("customer with id [%s] not found".formatted(id)));
+                .orElseThrow(()-> new ResourceNotFoundException(CUSTOMER_NOT_FOUND_MSG.formatted(id)));
     }
     public void updateCustomerById(Integer customerId, CustomerUpdateRequest request) {
         Customer customer = getCustomer(customerId);
@@ -56,7 +58,7 @@ public class CustomerService {
         }
         if(request.email() != null && !request.email().equals(customer.getEmail())){
             if(customerDao.existsCustomerWithEmail(request.email())){
-                throw new DuplicateResourceException("email already taken");
+                throw new DuplicateResourceException(CUSTOMER_ALREADY_EXIST_MSG);
             }
             customer.setEmail(request.email());
             changes = true;
@@ -68,7 +70,7 @@ public class CustomerService {
         }
 
         if(!changes)
-            throw new RequestValidationException("no data changes found");
+            throw new RequestValidationException(NO_DATA_CHANGES_MSG);
 
         customerDao.updateCustomer(customer);
     }
