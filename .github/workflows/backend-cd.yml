@@ -26,6 +26,10 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    defaults:
+      run:
+        working-directory: ./backend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -49,6 +53,7 @@ jobs:
 
       - name: Build Package and Push Docker Image with Maven
         run: mvn -ntp -B verify -Ddocker.image.tag=${{ steps.docker_build_number.outputs.BUILD_NUMBER }} jib:build
+        working-directory: ./backend
 
       - name: Set up SSH key
         run: |
