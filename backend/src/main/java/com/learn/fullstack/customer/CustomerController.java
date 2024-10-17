@@ -1,31 +1,40 @@
 package com.learn.fullstack.customer;
 
+import com.learn.fullstack.jwt.JWTUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = {"http://localhost:5173","http://localhost:3000"})
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("api/v1/customers")
 public class CustomerController {
-    private final CustomerService customerService;
 
-    public CustomerController(CustomerService customerService) {
-        this.customerService = customerService;
-    }
+    private final CustomerService customerService;
+    private final JWTUtil jwtUtil;
+
 
     @GetMapping
-    public List<Customer> getAllCustomers(){
+    public List<CustomerDto> getAllCustomers(){
         return  customerService.getAllCustomers();
     }
 
     @GetMapping("{customerId}")
-    public Customer getCustomerById(@PathVariable("customerId") Integer customerId){
+    public CustomerDto getCustomerById(@PathVariable("customerId") Integer customerId){
         return  customerService.getCustomerById(customerId);
     }
 
     @PostMapping
-    public void addCustomer(@RequestBody CustomerRegistrationRequest request){
+    public ResponseEntity<?> addCustomer(@RequestBody CustomerRegistrationRequest request){
         customerService.addCustomer(request);
+        String jwtToken = jwtUtil.issueToken(request.email(),"ROLE_USER");
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, jwtToken)
+                .build();
     }
 
     @DeleteMapping("{customerId}")

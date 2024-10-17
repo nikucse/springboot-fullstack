@@ -34,6 +34,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Slack Notification with commit message and sha
+        run: >
+          curl -X POST -H 'Content-type: application/json'
+          --data '{"text": "github: https://github.com/nikucse/springboot-fullstack/commit/${{github.sha}} - ${{github.event.head_commit.message}}"}'
+          ${{ secrets.SLACK_WEBHOOK }}
+      - name: Send Slack Notification
+        run: >
+          curl -X POST -H 'Content-type: application/json' 
+          --data '{"text": "Deployment Started :progress_bar: :fingerscrossed:"}'
+          ${{ secrets.SLACK_WEBHOOK }}
+
       - name: List Directory Contents
         run: ls -la  # Verify the contents of the backend directory
 

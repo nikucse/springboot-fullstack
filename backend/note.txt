@@ -130,3 +130,4 @@ client --> AWS Cloud --> VPC --> Public subnet (Load Balance) --> private subnet
 --> AWS Elastic Beanstalk
 --> Amazon ECS
 --> Amazon EC2
+

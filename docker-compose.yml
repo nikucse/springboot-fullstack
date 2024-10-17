@@ -20,13 +20,24 @@ services:
     container_name: fullstack-app
     image: technuzone/fullstack-app
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/customer
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/customer
     ports:
       - "8080:8080"
     networks:
       - db
     depends_on:
       - db
+    restart: unless-stopped
+
+  customer-web:
+    container_name: customer-web
+    image: technuzone/customer-web
+    build:
+      context: customer-web
+    ports:
+      - "3000:5173"
+    depends_on:
+      - fullstack-app
     restart: unless-stopped
 
 networks:
