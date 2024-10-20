@@ -4,9 +4,11 @@ import com.learn.fullstack.exception.DuplicateResourceException;
 import com.learn.fullstack.exception.RequestValidationException;
 import com.learn.fullstack.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.learn.fullstack.customer.CustomerConstant.*;
 
@@ -14,17 +16,25 @@ import static com.learn.fullstack.customer.CustomerConstant.*;
 public class CustomerService {
 
     private final CustomerDao customerDao;
+    private final PasswordEncoder passwordEncoder;
+    private final CustomerDtoMapper customerDtoMapper;
 
-    public CustomerService(@Qualifier("jdbc") CustomerDao customerDao) {
+    public CustomerService(@Qualifier("jdbc") CustomerDao customerDao, PasswordEncoder passwordEncoder, CustomerDtoMapper customerDtoMapper) {
         this.customerDao = customerDao;
+        this.passwordEncoder = passwordEncoder;
+        this.customerDtoMapper = customerDtoMapper;
     }
 
-    public List<Customer> getAllCustomers(){
-        return customerDao.getAllCustomers();
+    public List<CustomerDto> getAllCustomers(){
+        return customerDao.getAllCustomers()
+                .stream()
+                .map(customerDtoMapper)
+                .collect(Collectors.toList());
     }
 
-    public Customer getCustomerById(Integer id){
+    public CustomerDto getCustomerById(Integer id){
         return customerDao.getCustomerById(id)
+                .map(customerDtoMapper)
                 .orElseThrow(()-> new ResourceNotFoundException(CUSTOMER_NOT_FOUND_MSG.formatted(id)));
     }
 
@@ -34,7 +44,7 @@ public class CustomerService {
             throw new DuplicateResourceException(CUSTOMER_ALREADY_EXIST_MSG);
         }
 
-        customerDao.addCustomer(new Customer(request.name(), request.email(), request.age()));
+        customerDao.addCustomer(new Customer(request.name(), request.email(), passwordEncoder.encode(request.password()), request.age(), request.gender()));
     }
 
     public void deleteCustomerById(Integer customerId) {
