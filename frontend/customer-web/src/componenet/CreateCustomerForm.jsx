@@ -76,15 +76,19 @@ const CreateCustomerForm = ({ fetchCustomers }) => {
           email: '',
           age: 0,
           gender: '',
+          password: '',
         }}
         validationSchema={Yup.object({
           name: Yup.string()
             .max(15, 'Must be 15 characters or less')
             .required('Name is Required'),
-
           email: Yup.string()
             .email('Invalid email address')
             .required(' Email is Required'),
+          password: Yup.string()
+            .min(4, 'Must be 4 characters or less')
+            .max(15, 'Must be 15 characters or less')
+            .required('Password is Required'),
           age: Yup.number()
             .min(16, 'Must be at least 16 years of age')
             .max(100, 'Must be less than 100 years of age')
@@ -125,6 +129,12 @@ const CreateCustomerForm = ({ fetchCustomers }) => {
                   name='email'
                   type='email'
                   placeholder='doe@gmail.com'
+                />
+                <MyTextInput
+                  label='Password'
+                  name='password'
+                  type='password'
+                  placeholder={'Enter your password'}
                 />
 
                 <MyTextInput
